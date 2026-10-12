@@ -1,0 +1,14 @@
+{
+  "processName": "fallout2",
+  "falloutDirectory": null,
+  "outputDirectory": "CrashReports",
+  "dumpKind": "Normal",
+  "pollIntervalMilliseconds": 1000,
+  "detectNotResponding": true,
+  "notRespondingSeconds": 15,
+  "keepLastDumps": 20,
+  "copyRecentSaves": false,
+  "recentSaveCount": 1,
+  "copyLogs": true,
+  "knownErrorsPath": "known-errors.json"
+}

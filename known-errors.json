@@ -1,0 +1,22 @@
+[
+  {
+    "id": "fallout2-00427b25-combatai-msg",
+    "module": "fallout2.exe",
+    "address": "0x00427B25",
+    "tolerance": 32,
+    "description": "Access violation during combat AI data load",
+    "cause": "Broken or malformed text\\french\\game\\combatai.msg entry can leave an AI packet null during initialization.",
+    "workaround": "Validate braces and message numbers in combatai.msg, then retest with the original file restored.",
+    "reference": "Local diagnosis from crash_10122026_163227.dmp"
+  },
+  {
+    "id": "fallout2-004f11db-placeholder",
+    "module": "fallout2.exe",
+    "address": "0x004F11DB",
+    "tolerance": 0,
+    "description": "Known Fallout 2 crash address placeholder",
+    "cause": "To be documented from a confirmed dump and matching logs.",
+    "workaround": "Add project-specific notes when reproduced.",
+    "reference": ""
+  }
+]
