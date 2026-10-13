@@ -1,18 +1,11 @@
 namespace CrashMonitor.Core.Dumps
 {
+	using System;
+	using System.IO;
 	using System.ComponentModel;
 	using System.Diagnostics;
 	using System.Runtime.InteropServices;
-	using CrashMonitor.Core.Configuration;
-	using System;
-	using System.Collections.Generic;
-	using System.Globalization;
-	using System.IO;
-	using System.Linq;
-	using System.Text;
-	using System.Text.Json;
-	using System.Threading;
-	using System.Threading.Tasks;
+	using Configuration;
 
 	public sealed class MiniDumpWriter
 	{
@@ -21,7 +14,9 @@ namespace CrashMonitor.Core.Dumps
 			Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outputPath))!);
 
 			using var file = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
+
 			var dumpType = ToMiniDumpType(kind);
+
 			var ok = MiniDumpWriteDump(
 				process.Handle,
 				process.Id,

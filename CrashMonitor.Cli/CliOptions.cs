@@ -21,15 +21,11 @@ namespace CrashMonitor.Cli
 			{
 				var item = args[index];
 				if (!item.StartsWith("--", StringComparison.Ordinal))
-				{
 					continue;
-				}
 
 				var name = item[2..];
 				if (String.IsNullOrWhiteSpace(name))
-				{
 					continue;
-				}
 
 				if (index + 1 >= args.Length || args[index + 1].StartsWith("--", StringComparison.Ordinal))
 				{
@@ -47,6 +43,11 @@ namespace CrashMonitor.Cli
 		public String? Get(String name)
 		{
 			return _values.TryGetValue(name, out var value) ? value : null;
+		}
+
+		public Boolean Has(String name)
+		{
+			return _values.ContainsKey(name);
 		}
 
 		public Boolean TryGetInt32(String name, out Int32 value)

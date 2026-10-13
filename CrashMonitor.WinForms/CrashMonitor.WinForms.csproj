@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>disable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\CrashMonitor.Core\CrashMonitor.Core.csproj" />
+		<ProjectReference Include="..\CrashMonitor.Analyzer\CrashMonitor.Analyzer.csproj" />
+	</ItemGroup>
+
+</Project>

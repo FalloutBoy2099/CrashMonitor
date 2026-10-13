@@ -1,46 +1,39 @@
 namespace CrashMonitor.Analyzer.Reports
 {
-	using System.Text;
-	using CrashMonitor.Analyzer.KnownErrors;
-	using CrashMonitor.Analyzer.Minidumps;
 	using System;
-	using System.Collections.Generic;
-	using System.ComponentModel;
-	using System.Diagnostics;
-	using System.Globalization;
-	using System.IO;
 	using System.Linq;
-	using System.Runtime.InteropServices;
-	using System.Text.Json;
-	using System.Threading;
-	using System.Threading.Tasks;
+	using System.Text;
+	using KnownErrors;
+	using Minidumps;
 
 	public sealed class CrashReportBuilder
 	{
 		public String Build(MinidumpAnalysis analysis, KnownErrorMatch? match, String? contextPath = null)
 		{
 			var builder = new StringBuilder();
+
 			builder.AppendLine("# CrashMonitor Report");
 			builder.AppendLine();
 			builder.AppendLine($"- Dump: `{analysis.DumpPath}`");
 			builder.AppendLine($"- Generated: `{DateTimeOffset.Now:O}`");
 
 			if (contextPath is not null)
-			{
 				builder.AppendLine($"- Context: `{contextPath}`");
-			}
 
 			builder.AppendLine();
+
 			AppendSummary(builder, analysis, match);
 			AppendException(builder, analysis);
 			AppendRegisters(builder, analysis);
 			AppendModules(builder, analysis);
+
 			return builder.ToString();
 		}
 
 		private static void AppendSummary(StringBuilder builder, MinidumpAnalysis analysis, KnownErrorMatch? match)
 		{
 			builder.AppendLine("## Summary");
+
 			if (analysis.Exception is null)
 			{
 				builder.AppendLine("No exception stream was found in this minidump.");
@@ -50,17 +43,15 @@ namespace CrashMonitor.Analyzer.Reports
 
 			var module = analysis.FaultingModule;
 			var exception = analysis.Exception;
+
 			builder.AppendLine($"- Exception: `{FormatHex(exception.Code)}` {ExceptionName(exception.Code)}");
 			builder.AppendLine($"- Address: `{FormatHex(exception.Address)}`");
+
 			if (module is not null)
-			{
 				builder.AppendLine($"- Module: `{module.Name}+0x{module.OffsetOf(exception.Address):X}`");
-			}
 
 			if (exception.Code == 0xC0000005 && exception.Parameters.Count >= 2)
-			{
 				builder.AppendLine($"- Access violation: {AccessKind(exception.Parameters[0])} at `{FormatHex(exception.Parameters[1])}`");
-			}
 
 			if (match is null)
 			{
@@ -69,12 +60,18 @@ namespace CrashMonitor.Analyzer.Reports
 			else
 			{
 				builder.AppendLine($"- Known error: `{match.Entry.Id}` ({match.Entry.Description})");
+				builder.AppendLine($"- Confidence: {ConfidenceLabel(match.Entry)}");
 				builder.AppendLine($"- Cause: {match.Entry.Cause}");
 				builder.AppendLine($"- Workaround: {match.Entry.Workaround}");
+
+				if (!String.IsNullOrWhiteSpace(match.Entry.Source))
+					builder.AppendLine($"- Source: {match.Entry.Source}");
+
+				if (!String.IsNullOrWhiteSpace(match.Entry.ObservedMemoryAddress))
+					builder.AppendLine($"- Observed memory address: `{match.Entry.ObservedMemoryAddress}`");
+
 				if (!String.IsNullOrWhiteSpace(match.Entry.Reference))
-				{
 					builder.AppendLine($"- Reference: {match.Entry.Reference}");
-				}
 			}
 
 			builder.AppendLine();
@@ -83,6 +80,7 @@ namespace CrashMonitor.Analyzer.Reports
 		private static void AppendException(StringBuilder builder, MinidumpAnalysis analysis)
 		{
 			builder.AppendLine("## Exception");
+
 			if (analysis.Exception is null)
 			{
 				builder.AppendLine("No exception data.");
@@ -91,6 +89,7 @@ namespace CrashMonitor.Analyzer.Reports
 			}
 
 			var exception = analysis.Exception;
+
 			builder.AppendLine($"- Thread: `{exception.ThreadId}`");
 			builder.AppendLine($"- Code: `{FormatHex(exception.Code)}`");
 			builder.AppendLine($"- Address: `{FormatHex(exception.Address)}`");
@@ -101,6 +100,7 @@ namespace CrashMonitor.Analyzer.Reports
 		private static void AppendRegisters(StringBuilder builder, MinidumpAnalysis analysis)
 		{
 			builder.AppendLine("## Registers");
+
 			if (analysis.Exception is null || analysis.Exception.Registers.Count == 0)
 			{
 				builder.AppendLine("No register data.");
@@ -115,15 +115,12 @@ namespace CrashMonitor.Analyzer.Reports
 		private static void AppendModules(StringBuilder builder, MinidumpAnalysis analysis)
 		{
 			builder.AppendLine("## Modules");
+
 			foreach (var module in analysis.Modules.Take(80))
-			{
 				builder.AppendLine($"- `{FormatHex(module.BaseAddress)}-{FormatHex(module.EndAddress)}` `{module.Name}`");
-			}
 
 			if (analysis.Modules.Count > 80)
-			{
 				builder.AppendLine($"- ... {analysis.Modules.Count - 80} more modules");
-			}
 		}
 
 		private static String ExceptionName(UInt32 code)
@@ -148,6 +145,14 @@ namespace CrashMonitor.Analyzer.Reports
 				8 => "execute",
 				_ => $"operation {kind}"
 			};
+		}
+
+		private static String ConfidenceLabel(KnownErrorEntry entry)
+		{
+			if (!String.IsNullOrWhiteSpace(entry.Status))
+				return entry.Status;
+
+			return String.IsNullOrWhiteSpace(entry.Source) ? "Confirmed local entry" : "Imported";
 		}
 
 		private static String FormatHex(UInt32 value)

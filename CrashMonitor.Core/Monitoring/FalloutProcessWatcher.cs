@@ -1,20 +1,13 @@
 namespace CrashMonitor.Core.Monitoring
 {
-	using System.Diagnostics;
-	using CrashMonitor.Core.Configuration;
-	using CrashMonitor.Core.Context;
-	using CrashMonitor.Core.Dumps;
 	using System;
-	using System.Collections.Generic;
-	using System.ComponentModel;
-	using System.Globalization;
+	using System.Diagnostics;
 	using System.IO;
-	using System.Linq;
-	using System.Runtime.InteropServices;
-	using System.Text;
-	using System.Text.Json;
 	using System.Threading;
 	using System.Threading.Tasks;
+	using Configuration;
+	using Context;
+	using Dumps;
 
 	public sealed class FalloutProcessWatcher
 	{
@@ -41,6 +34,7 @@ namespace CrashMonitor.Core.Monitoring
 		public async Task WatchAsync(Action<String> log, CancellationToken cancellationToken)
 		{
 			log($"Waiting for {_config.ProcessName}.exe...");
+
 			while (!cancellationToken.IsCancellationRequested)
 			{
 				var process = _finder.FindFirst(_config.ProcessName);
@@ -63,6 +57,7 @@ namespace CrashMonitor.Core.Monitoring
 		{
 			var snapshot = CreateSnapshot(process);
 			log($"Attached to {snapshot.ProcessName}.exe PID {snapshot.ProcessId}.");
+
 			DateTimeOffset? notRespondingSince = null;
 			var dumpedFreeze = false;
 
@@ -130,6 +125,7 @@ namespace CrashMonitor.Core.Monitoring
 
 			_contextCollector.Collect(snapshot, captureDirectory);
 			_retentionService.Apply(_config.OutputDirectory, _config.KeepLastDumps);
+
 			return new CrashEvent(snapshot, reason, exitCode, dump, captureDirectory, DateTimeOffset.Now);
 		}
 
@@ -138,7 +134,9 @@ namespace CrashMonitor.Core.Monitoring
 			var root = Path.GetFullPath(_config.OutputDirectory);
 			var name = $"{DateTime.Now:yyyyMMdd_HHmmss}_{snapshot.ProcessName}_{reason}";
 			var path = Path.Combine(root, name);
+
 			Directory.CreateDirectory(path);
+
 			return path;
 		}
 
@@ -146,10 +144,9 @@ namespace CrashMonitor.Core.Monitoring
 		{
 			var modulePath = process.MainModuleFileNameSafe();
 			var workingDirectory = _config.FalloutDirectory;
+
 			if (String.IsNullOrWhiteSpace(workingDirectory) && !String.IsNullOrWhiteSpace(modulePath))
-			{
 				workingDirectory = Path.GetDirectoryName(modulePath);
-			}
 
 			return new ProcessSnapshot(
 				process.Id,
