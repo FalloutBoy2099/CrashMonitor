@@ -16,10 +16,10 @@ CrashMonitor is a modern Windows/.NET replacement for the old AutoIt watcher use
 dotnet build .\CrashMonitor.slnx
 ```
 
-Run the small WinForms interface:
+Run the small WPF interface:
 
 ```powershell
-dotnet run --project .\CrashMonitor.WinForms
+dotnet run --project .\CrashMonitor.Wpf
 ```
 
 ## Usage

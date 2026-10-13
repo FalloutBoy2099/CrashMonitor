@@ -2,5 +2,5 @@
   <Project Path="CrashMonitor.Analyzer/CrashMonitor.Analyzer.csproj" />
   <Project Path="CrashMonitor.Cli/CrashMonitor.Cli.csproj" />
   <Project Path="CrashMonitor.Core/CrashMonitor.Core.csproj" />
-  <Project Path="CrashMonitor.WinForms/CrashMonitor.WinForms.csproj" />
+  <Project Path="CrashMonitor.Wpf/CrashMonitor.Wpf.csproj" />
 </Solution>

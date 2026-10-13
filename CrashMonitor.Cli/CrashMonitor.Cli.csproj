@@ -6,6 +6,8 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+		<AssemblyVersion>2026.10.13.1</AssemblyVersion>
+		<FileVersion>2026.10.13.1</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
