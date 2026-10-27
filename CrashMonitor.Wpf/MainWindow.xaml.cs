@@ -9,6 +9,7 @@ namespace CrashMonitor.Wpf
 		public MainWindow()
 		{
 			InitializeComponent();
+
 			DataContext = new MainWindowViewModel(
 				new CrashMonitorUiService(),
 				new FileDialogService(),
